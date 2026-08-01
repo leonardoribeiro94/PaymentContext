@@ -1,8 +1,10 @@
 using PaymentContext.Domain.ValueObjects;
+using PaymentContext.Shared.Entities;
+using PaymentContext.Shared.Notifications;
 
 namespace PaymentContext.Domain.Entities.Payments
 {
-    public abstract class Payment
+    public abstract class Payment : Entity
     {
         protected Payment(DateTime paidDate, DateTime expireDate, decimal total, decimal totalPaid, string owner, Document document, Email email, Address address)
         {
@@ -15,6 +17,10 @@ namespace PaymentContext.Domain.Entities.Payments
             Document = document;
             Email = email;
             Address = address;
+
+            Contract.New(this)
+                .IsGreaterThan(total, 0, "Payment.Total", "Total must be greater than zero")
+                .IsGreaterOrEqualsThan(total, totalPaid, "Payment.TotalPaid", "Total paid must be greater than or equal to total");
         }
 
         public string Number { get; private set; }

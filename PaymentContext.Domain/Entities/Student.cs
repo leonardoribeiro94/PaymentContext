@@ -2,6 +2,7 @@
 
 using PaymentContext.Domain.ValueObjects;
 using PaymentContext.Shared.Entities;
+using PaymentContext.Shared.Notifications;
 
 namespace PaymentContext.Domain.Entities
 {
@@ -26,13 +27,21 @@ namespace PaymentContext.Domain.Entities
         public void AddSubscription(Subscription subscription)
         {
 
+            var hassubscriptionActive = false;
+
             // cencela todas as outras assinaturas, e coloca esta como principal
-            foreach (var sub in Subscriptions)
+            foreach (var sub in _subscriptions)
             {
-                sub.Inactivate();
+                if (sub.Active)
+                    hassubscriptionActive = true;
             }
 
-            _subscriptions.Add(subscription);
+            Contract.New(this)
+                .IsFalse(hassubscriptionActive, "student.subscription", "Você já tem uma assinatura ativa.")
+                .IsTrue(hassubscriptionActive, "student.subscription", "Assinatura adicionada com sucesso.");
+
+
+            
         }
 
     }

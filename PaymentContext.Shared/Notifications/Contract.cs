@@ -28,6 +28,34 @@
             return this;
         }
 
+        public ContractBuilder<T> IsGreaterThan(Decimal value, Decimal comparer, string key, string message)
+        {
+            if (value <= comparer)
+            {
+                _notifiable.AddNotification(key, message);
+            }
+
+            return this;
+        }
+
+        public ContractBuilder<T> IsGreaterOrEqualsThan(int value, int comparer, string key, string message)
+        {
+            if (value < comparer)
+            {
+                _notifiable.AddNotification(key, message);
+            }
+            return this;
+        }
+
+        public ContractBuilder<T> IsGreaterOrEqualsThan(Decimal value, Decimal comparer, string key, string message)
+        {
+            if (value < comparer)
+            {
+                _notifiable.AddNotification(key, message);
+            }
+            return this;
+        }
+
         public ContractBuilder<T> IsLowerThan(int value, int comparer, string key, string message)
         {
             if (value >= comparer)
@@ -71,6 +99,27 @@
             {
                 _notifiable.AddNotification(key, message);
             }
+            return this;
+        }
+
+        public ContractBuilder<T> IsTrue(bool value, string key, string message)
+        {
+            if (value != true)
+            {
+                _notifiable.AddNotification(key, message);
+
+            }
+
+            return this;
+        }
+
+        public ContractBuilder<T> IsFalse(bool value, string key, string message)
+        {
+            if (value != false)
+            {
+                _notifiable.AddNotification(key, message);
+            }
+
             return this;
         }
 

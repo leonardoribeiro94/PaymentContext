@@ -1,6 +1,4 @@
 ﻿using PaymentContext.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
 namespace PaymentContext.Domain.Entities.Payments
 {
     public class CreditCardPayment : Payment

@@ -1,9 +1,11 @@
 using PaymentContext.Domain.Entities.Payments;
+using PaymentContext.Shared.Entities;
+using PaymentContext.Shared.Notifications;
 
 namespace PaymentContext.Domain.Entities
 {
 
-    public class Subscription
+    public class Subscription : Entity
     {
         private IList<Payment> _payments;
 
@@ -25,6 +27,10 @@ namespace PaymentContext.Domain.Entities
 
         public void AddPayment(Payment payment)
         {
+            Contract.New(this)
+                .Requires()
+                .IsGreaterThan(DateTime.Now.Day, payment.PaidDate.Day, "Subscription.Payments", "A data do pagamento deve ser futura");
+
             foreach (var item in _payments)
                 _payments.Remove(item);
 

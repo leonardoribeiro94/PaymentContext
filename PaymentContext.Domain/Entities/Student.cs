@@ -26,10 +26,8 @@ namespace PaymentContext.Domain.Entities
 
         public void AddSubscription(Subscription subscription)
         {
-
             var hassubscriptionActive = false;
 
-            // cencela todas as outras assinaturas, e coloca esta como principal
             foreach (var sub in _subscriptions)
             {
                 if (sub.Active)
@@ -37,11 +35,8 @@ namespace PaymentContext.Domain.Entities
             }
 
             Contract.New(this)
-                .IsFalse(hassubscriptionActive, "student.subscription", "Você já tem uma assinatura ativa.")
-                .IsTrue(hassubscriptionActive, "student.subscription", "Assinatura adicionada com sucesso.");
-
-
-            
+                .IsFalse(hassubscriptionActive, "Student.Subscriptions", "You already have an active subscription")
+                .IsGreaterThan(subscription.Payments.Count, 0, "Student.Subscription.Payments", "This subscription has no payments");
         }
 
     }

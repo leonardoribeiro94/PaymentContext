@@ -45,31 +45,29 @@ namespace PaymentContext.Tests.Entities.Payments
         }
 
         [Fact]
-        public void ShouldNotifyWhenTotalPaidExceedsTotal()
+        public void ShouldNotifyWhenTotalPaidIsLessThanTotal()
         {
-            // Olhando a implementação:
-            //   IsGreaterOrEqualsThan(value: total, comparer: totalPaid, ...)
+            // Bug corrigido: a chamada virou
+            //   IsGreaterOrEqualsThan(value: totalPaid, comparer: total, ...)
             //   { if (value < comparer) AddNotification(...); }
-            // Ou seja, notifica quando total < totalPaid — isto é, quando
-            // pagaram A MAIS do que o total devido.
-            var payment = BuildPayment(total: 100, totalPaid: 150);
+            // Agora notifica quando totalPaid < total — ou seja, quando
+            // pagaram MENOS do que o total devido (subpagamento), que é o
+            // que a mensagem de erro sempre sugeriu.
+            var payment = BuildPayment(total: 100, totalPaid: 50);
 
             Assert.False(payment.IsValid);
             Assert.Contains(payment.Notifications, n => n.Key == "Payment.TotalPaid");
         }
 
         [Fact]
-        public void ShouldCurrentlyAcceptTotalPaidLowerThanTotal()
+        public void ShouldAcceptTotalPaidGreaterThanTotal()
         {
-            // Isto aqui é o achado mais importante deste arquivo: a mensagem
-            // da regra diz "Total paid must be greater than or equal to
-            // total", mas a CONDIÇÃO implementada só dispara quando
-            // total < totalPaid (pagou a mais). Pagar MENOS do que o total
-            // (totalPaid = 50, total = 100) não é pego por nenhuma regra —
-            // mesmo pagando bem menos, o Payment sai válido. Documentando o
-            // comportamento atual; a mensagem sugere que a intenção original
-            // era o contrário (validar SUBPAGAMENTO, não sobrepagamento).
-            var payment = BuildPayment(total: 100, totalPaid: 50);
+            // Com a ordem corrigida, pagar A MAIS que o total (totalPaid =
+            // 150, total = 100) passa a ser aceito — só subpagamento é
+            // bloqueado agora. Se a regra de negócio real também deve barrar
+            // sobrepagamento, falta uma checagem extra própria pra isso; a
+            // atual (IsGreaterOrEqualsThan) só cobre uma direção por vez.
+            var payment = BuildPayment(total: 100, totalPaid: 150);
 
             Assert.True(payment.IsValid);
         }

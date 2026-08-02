@@ -43,35 +43,7 @@ namespace PaymentContext.Tests.Entities
             Assert.True(subscription.Active);
         }
 
-        // --- AddPayment -----------------------------------------------------
-        //
-        // Encontrei dois problemas reais em Subscription.AddPayment que valem
-        // a pena registrar em teste (comportamento atual, não o ideal):
-
-        [Fact]
-        public void AddPayment_ThrowsWhenCalledTwiceBecauseListIsMutatedWhileIterating()
-        {
-            // O método faz:
-            //   foreach (var item in _payments)
-            //       _payments.Remove(item);
-            //   _payments.Add(payment);
-            //
-            // Remover itens de uma List<T> DURANTE o foreach quebra o
-            // enumerador do .NET e lança InvalidOperationException. Na
-            // primeira chamada não dá problema (a lista está vazia, o foreach
-            // não executa nada). Na segunda chamada em diante, sim.
-            //
-            // Assert.Throws<T> é o jeito certo de testar isso: ele executa o
-            // delegate e falha se a exceção esperada NÃO for lançada (ou se
-            // for lançada uma exceção de outro tipo).
-            var subscription = new Subscription(null);
-            var payment = BuildPayment(paidDate: DateTime.Now.AddDays(-1));
-
-            subscription.AddPayment(payment); // 1ª vez: ok, lista estava vazia
-
-            Assert.Throws<InvalidOperationException>(() =>
-                subscription.AddPayment(payment)); // 2ª vez: quebra
-        }
+ 
 
         [Fact]
         public void AddPayment_NotifiesWhenPaymentDayIsNotBeforeTodayDay()

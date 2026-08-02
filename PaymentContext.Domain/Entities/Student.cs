@@ -37,6 +37,9 @@ namespace PaymentContext.Domain.Entities
             Contract.New(this)
                 .IsFalse(hassubscriptionActive, "Student.Subscriptions", "You already have an active subscription")
                 .IsGreaterThan(subscription.Payments.Count, 0, "Student.Subscription.Payments", "This subscription has no payments");
+
+            if (IsValid)
+                _subscriptions.Add(subscription);
         }
 
     }

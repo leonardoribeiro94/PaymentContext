@@ -28,6 +28,15 @@
             return this;
         }
 
+        public ContractBuilder<T> IsGreaterThan(DateTime value, DateTime comparer, string key, string message)
+        {
+            if (value <= comparer)
+            {
+                _notifiable.AddNotification(key, message);
+            }
+            return this;
+        }
+
         public ContractBuilder<T> IsGreaterThan(Decimal value, Decimal comparer, string key, string message)
         {
             if (value <= comparer)

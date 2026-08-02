@@ -20,7 +20,7 @@ namespace PaymentContext.Domain.Entities.Payments
 
             Contract.New(this)
                 .IsGreaterThan(total, 0, "Payment.Total", "Total must be greater than zero")
-                .IsGreaterOrEqualsThan(total, totalPaid, "Payment.TotalPaid", "Total paid must be greater than or equal to total");
+                .IsGreaterOrEqualsThan(totalPaid, total, "Payment.TotalPaid", "Total paid must be greater than or equal to zero");
         }
 
         public string Number { get; private set; }

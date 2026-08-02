@@ -29,17 +29,16 @@ namespace PaymentContext.Domain.Entities
         {
             Contract.New(this)
                 .Requires()
-                .IsGreaterThan(DateTime.Now.Day, payment.PaidDate.Day, "Subscription.Payments", "A data do pagamento deve ser futura");
+                .IsGreaterThan(DateTime.Now, payment.PaidDate, "Subscription.Payments", "A data do pagamento deve ser futura");
 
-            foreach (var item in _payments)
-                _payments.Remove(item);
-
-            _payments.Add(payment);
+            if (IsValid)
+                _payments.Add(payment);
         }
 
         public void Inactivate()
         {
-            Active = false; LastUpdateDate = DateTime.Now;
+            Active = false;
+            LastUpdateDate = DateTime.Now;
         }
 
         public void Activate()

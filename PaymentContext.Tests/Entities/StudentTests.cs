@@ -1,4 +1,4 @@
-using PaymentContext.Domain.Entities;
+﻿using PaymentContext.Domain.Entities;
 using PaymentContext.Tests.TestHelpers;
 
 namespace PaymentContext.Tests.Entities
@@ -58,43 +58,38 @@ namespace PaymentContext.Tests.Entities
         }
 
         [Fact]
-        public void AddSubscription_StillDoesNotAddTheSubscriptionToTheCollection()
+        public void ShouldAddTheSubscriptionToTheCollectionWhenItIsValid()
         {
-            // Este teste passa hoje, mas documenta um bug que AINDA não foi
-            // corrigido (independente da regra de pagamentos acima): o
-            // método nunca faz "_subscriptions.Add(subscription)", então
-            // Student.Subscriptions continua vazio mesmo numa chamada
-            // "bem-sucedida" (válida). Quando você adicionar o Add que
-            // falta, troque o Assert.Empty abaixo pelas duas linhas
-            // comentadas.
             var student = DomainObjectMother.ValidStudent();
             var subscription = DomainObjectMother.ValidSubscriptionWithPayment();
 
             student.AddSubscription(subscription);
 
-            Assert.Empty(student.Subscriptions);
-
-            // Assert.Single(student.Subscriptions);
-            // Assert.Same(subscription, student.Subscriptions.First());
+            Assert.Single(student.Subscriptions);
+            Assert.Same(subscription, student.Subscriptions.First());
         }
 
         [Fact]
-        public void AddSubscription_SecondCallStillDoesNotDetectAnActiveSubscription()
+        public void ShouldNotifyAndNotAddWhenStudentAlreadyHasAnActiveSubscription()
         {
-            // Consequência direta do bug acima: como nenhuma assinatura
-            // chega a entrar em _subscriptions, "hassubscriptionActive"
-            // nunca fica true via API pública — a regra "Student.Subscriptions"
-            // (já tem assinatura ativa) está com o caminho de acesso quebrado
-            // (unreachable), mesmo a lógica dela estando correta agora.
+            // Consequência boa do fix acima: a regra "Student.Subscriptions"
+            // (já tem assinatura ativa) era código morto antes — agora que a
+            // primeira assinatura fica de fato registrada em _subscriptions,
+            // esse caminho é alcançável de verdade pela API pública.
             var student = DomainObjectMother.ValidStudent();
             var first = DomainObjectMother.ValidSubscriptionWithPayment();
             var second = DomainObjectMother.ValidSubscriptionWithPayment();
 
-            student.AddSubscription(first);
-            student.AddSubscription(second);
+            student.AddSubscription(first);   // vira a assinatura ativa
+            student.AddSubscription(second);  // deve ser rejeitada
 
-            Assert.True(student.IsValid);
-            Assert.Empty(student.Notifications);
+            Assert.False(student.IsValid);
+            Assert.Contains(student.Notifications, n => n.Key == "Student.Subscriptions");
+
+            // A segunda assinatura não deve ter sido adicionada: só a
+            // primeira permanece na coleção.
+            Assert.Single(student.Subscriptions);
+            Assert.Same(first, student.Subscriptions.First());
         }
     }
 }

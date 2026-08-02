@@ -22,7 +22,7 @@ namespace PaymentContext.Tests.TestHelpers
             => new("95034048000", EDocumentType.CPF);
 
         public static Document ValidCnpj()
-            => new("12345678000195", EDocumentType.CNPJ);
+            => new("95353084000153", EDocumentType.CNPJ);
 
         public static Email ValidEmail()
             => new("john.doe@example.com");
